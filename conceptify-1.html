@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conceptify — Master Every Concept</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060b14;
+    --bg2: #0a1220;
+    --bg3: #0f1a2e;
+    --blue: #2563eb;
+    --blue-light: #3b82f6;
+    --blue-glow: #60a5fa;
+    --accent: #38bdf8;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+    --border: rgba(37,99,235,0.2);
+    --card: rgba(10,18,32,0.8);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom Cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--blue-glow);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s ease;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1.5px solid rgba(96,165,250,0.4);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.15s ease;
+  }
+
+  /* Background Effects */
+  .bg-grid {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .bg-glow {
+    position: fixed;
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    width: 800px; height: 500px;
+    background: radial-gradient(ellipse, rgba(37,99,235,0.12) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .noise {
+    position: fixed;
+    inset: 0;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Nav */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(37,99,235,0.1);
+    backdrop-filter: blur(20px);
+    background: rgba(6,11,20,0.7);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    letter-spacing: -0.5px;
+    color: #fff;
+  }
+  .logo span { color: var(--blue-glow); }
+
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .nav-links a:hover { color: var(--blue-glow); }
+
+  .nav-cta {
+    background: var(--blue);
+    color: #fff !important;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-weight: 600 !important;
+    transition: background 0.2s, transform 0.2s !important;
+  }
+  .nav-cta:hover { background: var(--blue-light) !important; transform: translateY(-1px); }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 20px 80px;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(37,99,235,0.12);
+    border: 1px solid rgba(37,99,235,0.3);
+    border-radius: 100px;
+    padding: 8px 18px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--blue-glow);
+    margin-bottom: 32px;
+    animation: fadeUp 0.8s ease both;
+  }
+  .badge-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -2px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.8s ease 0.1s both;
+  }
+
+  .hero h1 .line2 {
+    display: block;
+    background: linear-gradient(135deg, var(--blue-glow), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    max-width: 560px;
+    color: var(--text-dim);
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 44px;
+    animation: fadeUp 0.8s ease 0.2s both;
+  }
+
+  .hero-btns {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeUp 0.8s ease 0.3s both;
+  }
+
+  .btn-primary {
+    background: var(--blue);
+    color: #fff;
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: none;
+    cursor: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary:hover {
+    background: var(--blue-light);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(37,99,235,0.4);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-dim);
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+    cursor: none;
+  }
+  .btn-secondary:hover {
+    border-color: var(--blue-light);
+    color: var(--blue-glow);
+    transform: translateY(-2px);
+  }
+
+  /* Stats */
+  .stats {
+    display: flex;
+    gap: 60px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 72px;
+    animation: fadeUp 0.8s ease 0.4s both;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fff;
+    display: block;
+  }
+  .stat-num span { color: var(--blue-glow); }
+  .stat-label {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+  }
+
+  /* Subjects Section */
+  .section {
+    position: relative;
+    z-index: 1;
+    padding: 100px 60px;
+  }
+
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--blue-glow);
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+  }
+
+  .section-sub {
+    color: var(--text-dim);
+    font-size: 1rem;
+    max-width: 480px;
+    line-height: 1.6;
+    margin-bottom: 60px;
+  }
+
+  /* Subject Cards */
+  .subjects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+
+  .subject-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: none;
+    backdrop-filter: blur(10px);
+  }
+
+  .subject-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(37,99,235,0.08), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .subject-card:hover {
+    border-color: rgba(37,99,235,0.5);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(37,99,235,0.15);
+  }
+  .subject-card:hover::before { opacity: 1; }
+
+  .subject-icon {
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+
+  .physics .subject-icon { background: rgba(59,130,246,0.15); }
+  .chemistry .subject-icon { background: rgba(16,185,129,0.15); }
+  .math .subject-icon { background: rgba(245,158,11,0.15); }
+  .biology .subject-icon { background: rgba(239,68,68,0.15); }
+  .english .subject-icon { background: rgba(168,85,247,0.15); }
+
+  .subject-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .subject-card p {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .subject-meta {
+    display: flex;
+    gap: 12px;
+  }
+
+  .tag {
+    background: rgba(37,99,235,0.12);
+    border: 1px solid rgba(37,99,235,0.2);
+    color: var(--blue-glow);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 100px;
+  }
+
+  /* Features */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .feature {
+    padding: 40px;
+    background: var(--bg2);
+    transition: background 0.3s;
+    position: relative;
+  }
+  .feature:hover { background: var(--bg3); }
+
+  .feature-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--blue);
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+  }
+
+  .feature h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .feature p {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    line-height: 1.65;
+  }
+
+  /* Classes section */
+  .classes-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .class-pill {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 28px;
+    text-align: center;
+    cursor: none;
+    transition: all 0.2s;
+    flex: 1;
+    min-width: 140px;
+  }
+  .class-pill:hover {
+    border-color: var(--blue);
+    background: rgba(37,99,235,0.08);
+    transform: translateY(-3px);
+  }
+  .class-pill .class-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--blue-glow);
+    display: block;
+  }
+  .class-pill .class-label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* CTA Section */
+  .cta-section {
+    position: relative;
+    z-index: 1;
+    padding: 100px 60px;
+    text-align: center;
+  }
+
+  .cta-box {
+    background: linear-gradient(135deg, rgba(37,99,235,0.15), rgba(56,189,248,0.08));
+    border: 1px solid rgba(37,99,235,0.3);
+    border-radius: 24px;
+    padding: 80px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-box::before {
+    content: '';
+    position: absolute;
+    top: -100px; left: 50%;
+    transform: translateX(-50%);
+    width: 400px; height: 300px;
+    background: radial-gradient(ellipse, rgba(37,99,235,0.2), transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-box h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+  }
+
+  .cta-box p {
+    color: var(--text-dim);
+    font-size: 1rem;
+    margin-bottom: 36px;
+  }
+
+  /* Footer */
+  footer {
+    position: relative;
+    z-index: 1;
+    padding: 40px 60px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: gap;
+  }
+
+  footer .logo { font-size: 1.2rem; }
+
+  .footer-text {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: all 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--blue); border-radius: 3px; }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    .section { padding: 60px 24px; }
+    .cta-section { padding: 60px 24px; }
+    footer { padding: 30px 24px; flex-direction: column; gap: 12px; text-align: center; }
+    .stats { gap: 32px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<div class="noise"></div>
+
+<!-- Nav -->
+<nav>
+  <div class="logo">Concept<span>ify</span></div>
+  <ul class="nav-links">
+    <li><a href="#subjects">Subjects</a></li>
+    <li><a href="#classes">Classes</a></li>
+    <li><a href="#features">Why Us</a></li>
+    <li><a href="#" class="nav-cta">Start Learning</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="badge-dot"></span>
+    Free CBSE Study Material
+  </div>
+
+  <h1>
+    Learn Every
+    <span class="line2">Concept.</span>
+  </h1>
+
+  <p>CBSE Class 9–12 notes, solved questions, and concept breakdowns — explained clearly, so you actually understand.</p>
+
+  <div class="hero-btns">
+    <a href="#subjects" class="btn-primary">
+      Explore Subjects
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+    <a href="#classes" class="btn-secondary">Browse by Class</a>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-num">5<span>+</span></span>
+      <div class="stat-label">Subjects</div>
+    </div>
+    <div class="stat">
+      <span class="stat-num">9–12<span>th</span></span>
+      <div class="stat-label">All Classes</div>
+    </div>
+    <div class="stat">
+      <span class="stat-num">100<span>%</span></span>
+      <div class="stat-label">Free Content</div>
+    </div>
+    <div class="stat">
+      <span class="stat-num">CBSE</span>
+      <div class="stat-label">Aligned</div>
+    </div>
+  </div>
+</section>
+
+<!-- Subjects -->
+<section class="section" id="subjects">
+  <div class="reveal">
+    <div class="section-label">What We Cover</div>
+    <h2 class="section-title">All Core Subjects</h2>
+    <p class="section-sub">Physics, Chemistry, Math, Biology — every subject covered with clear concepts and solved examples.</p>
+  </div>
+
+  <div class="subjects-grid reveal">
+    <div class="subject-card physics">
+      <div class="subject-icon">⚡</div>
+      <h3>Physics</h3>
+      <p>From mechanics to modern physics — concepts explained with derivations and numerical problems.</p>
+      <div class="subject-meta">
+        <span class="tag">Class 9–12</span>
+        <span class="tag">CBSE</span>
+      </div>
+    </div>
+
+    <div class="subject-card chemistry">
+      <div class="subject-icon">🧪</div>
+      <h3>Chemistry</h3>
+      <p>Organic, Inorganic, Physical — all chapters with reactions, mechanisms and important questions.</p>
+      <div class="subject-meta">
+        <span class="tag">Class 9–12</span>
+        <span class="tag">CBSE</span>
+      </div>
+    </div>
+
+    <div class="subject-card math">
+      <div class="subject-icon">📐</div>
+      <h3>Mathematics</h3>
+      <p>Step-by-step solutions, formulas, and practice problems for every chapter.</p>
+      <div class="subject-meta">
+        <span class="tag">Class 9–12</span>
+        <span class="tag">CBSE</span>
+      </div>
+    </div>
+
+    <div class="subject-card biology">
+      <div class="subject-icon">🧬</div>
+      <h3>Biology</h3>
+      <p>Detailed notes with diagrams, NCERT solutions, and important one-liners for exams.</p>
+      <div class="subject-meta">
+        <span class="tag">Class 9–12</span>
+        <span class="tag">CBSE</span>
+      </div>
+    </div>
+
+    <div class="subject-card english">
+      <div class="subject-icon">📝</div>
+      <h3>English</h3>
+      <p>Grammar, writing skills, literature summaries and important questions from all chapters.</p>
+      <div class="subject-meta">
+        <span class="tag">Class 9–12</span>
+        <span class="tag">CBSE</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Classes -->
+<section class="section" id="classes" style="padding-top: 0;">
+  <div class="reveal">
+    <div class="section-label">Browse by Class</div>
+    <h2 class="section-title">Pick Your Class</h2>
+    <p class="section-sub">Select your class and jump straight to the content you need.</p>
+  </div>
+
+  <div class="classes-row reveal">
+    <div class="class-pill">
+      <span class="class-num">9</span>
+      <div class="class-label">Class 9th</div>
+    </div>
+    <div class="class-pill">
+      <span class="class-num">10</span>
+      <div class="class-label">Class 10th</div>
+    </div>
+    <div class="class-pill">
+      <span class="class-num">11</span>
+      <div class="class-label">Class 11th</div>
+    </div>
+    <div class="class-pill">
+      <span class="class-num">12</span>
+      <div class="class-label">Class 12th</div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="section" id="features">
+  <div class="reveal">
+    <div class="section-label">Why Conceptify</div>
+    <h2 class="section-title">Built for Students</h2>
+    <p class="section-sub">No fluff, no confusion — just clear, exam-focused content.</p>
+  </div>
+
+  <div class="features-grid reveal">
+    <div class="feature">
+      <div class="feature-num">01</div>
+      <h3>Clear Concepts</h3>
+      <p>Every topic explained simply — no complicated jargon, just real understanding.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-num">02</div>
+      <h3>NCERT Aligned</h3>
+      <p>All content follows the CBSE NCERT syllabus so you're always exam-ready.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-num">03</div>
+      <h3>Solved Questions</h3>
+      <p>Important questions with full step-by-step solutions for every chapter.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-num">04</div>
+      <h3>100% Free</h3>
+      <p>Everything on Conceptify is completely free — no subscriptions, no paywalls.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-num">05</div>
+      <h3>All 4 Subjects</h3>
+      <p>Physics, Chemistry, Math and Biology — everything in one place.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-num">06</div>
+      <h3>Class 9 to 12</h3>
+      <p>Complete coverage from Class 9 all the way to Class 12 boards.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-box reveal">
+    <h2>Start Learning Today</h2>
+    <p>Free CBSE study material — available for all classes and subjects.</p>
+    <a href="#subjects" class="btn-primary" style="display: inline-flex;">
+      Explore Now
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="logo">Concept<span>ify</span></div>
+  <div class="footer-text">Free CBSE Study Material — Class 9 to 12</div>
+  <div class="footer-text">© 2025 Conceptify</div>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx - 6 + 'px';
+    cursor.style.top = my - 6 + 'px';
+  });
+
+  function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx - 18 + 'px';
+    ring.style.top = ry - 18 + 'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+
+  document.querySelectorAll('a, button, .subject-card, .class-pill, .feature').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'scale(2)';
+      ring.style.transform = 'scale(1.5)';
+      ring.style.borderColor = 'rgba(96,165,250,0.7)';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'scale(1)';
+      ring.style.transform = 'scale(1)';
+      ring.style.borderColor = 'rgba(96,165,250,0.4)';
+    });
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(r => observer.observe(r));
+</script>
+</body>
+</html>
